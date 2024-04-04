@@ -21,11 +21,14 @@ app.get('/', (req, res) => {
 
 //listening for incoming events using socket.io
 io.on('connection', (socket) => {
-  console.log('a user connected');
-  //add disconnect event to each socket
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
+  socket.on('chat message', (msg) => {
+    console.log('message: ' + msg);
   });
+  // console.log('a user connected');
+  // //add disconnect event to each socket
+  // socket.on('disconnect', () => {
+  //   console.log('user disconnected');
+  // });
 });
 
 //server request running on port 3000
