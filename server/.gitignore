@@ -2,3 +2,4 @@
 *-nogit
 /**/*.env
 **/.DS_Store
+chat.db
