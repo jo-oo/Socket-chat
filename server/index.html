@@ -16,10 +16,20 @@
       #messages > li:nth-child(odd) { background: #efefef; }
     </style>
   </head>
+
   <body>
+    <!-- HTML content here -->
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
+    <!-- JS code here -->
+    <!---load the socket.io-client, which exposes an io global (and the endpoint GET /socket.io/socket.io.js) --->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+    </script>
+    
   </body>
+
 </html>
