@@ -22,17 +22,37 @@
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
+      <!---testing disconnections--->
+      <button id="toggle-btn">Disconnect</button>
     </form>
     <!-- JS code here -->
     <!---load the socket.io-client, which exposes an io global (and the endpoint GET /socket.io/socket.io.js) --->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        //The client will then keep track of the offset(the disconnection)
+        const socket = io({
+            auth: {
+            serverOffset: 0
+            }
+        });
       
         //when the user types in a message, the server gets it as a chat message event.
         const form = document.getElementById('form');
         const input = document.getElementById('input');
         const messages = document.getElementById('messages');
+        const toggleButton = document.getElementById('toggle-btn');
+
+        //for testing disconnections
+        toggleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (socket.connected) {
+            toggleButton.innerText = 'Connect';
+            socket.disconnect();
+        } else {
+            toggleButton.innerText = 'Disconnect';
+            socket.connect();
+        }
+        });
       
         //Emit the event (the event is what the person types in the input form (the chat))
         form.addEventListener('submit', (e) => {
@@ -44,11 +64,14 @@
         });
 
         //when we capture a chat message event we’ll include it in the page.
-        socket.on('chat message', (msg) => {
+        socket.on('chat message', (msg, serverOffset) => {
+            //chat html:
             const item = document.createElement('li');
             item.textContent = msg;
             messages.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
+            //handeling disconnections:
+            socket.auth.serverOffset = serverOffset;
         });
       </script>
     
