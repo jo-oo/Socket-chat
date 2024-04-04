@@ -32,13 +32,23 @@
         //when the user types in a message, the server gets it as a chat message event.
         const form = document.getElementById('form');
         const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
       
+        //Emit the event (the event is what the person types in the input form (the chat))
         form.addEventListener('submit', (e) => {
           e.preventDefault();
           if (input.value) {
             socket.emit('chat message', input.value);
             input.value = '';
           }
+        });
+
+        //when we capture a chat message event we’ll include it in the page.
+        socket.on('chat message', (msg) => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
         });
       </script>
     

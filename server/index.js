@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
 //listening for incoming events using socket.io
 io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
+    //emit the event from the server to the rest of the users
+    //send the message to everyone, including the sender:
+    io.emit('chat message', msg);
+    
     console.log('message: ' + msg);
   });
   // console.log('a user connected');
