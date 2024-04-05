@@ -28,14 +28,20 @@
     <!-- JS code here -->
     <!---load the socket.io-client, which exposes an io global (and the endpoint GET /socket.io/socket.io.js) --->
     <script src="/socket.io/socket.io.js"></script>
+
     <script>
+        let counter = 0;
+
         //The client will then keep track of the offset(the disconnection)
         const socket = io({
             auth: {
             serverOffset: 0
-            }
+            },
+            // enable retries
+            ackTimeout: 10000,
+            retries: 3,
         });
-      
+        
         //when the user types in a message, the server gets it as a chat message event.
         const form = document.getElementById('form');
         const input = document.getElementById('input');
@@ -58,7 +64,9 @@
         form.addEventListener('submit', (e) => {
           e.preventDefault();
           if (input.value) {
-            socket.emit('chat message', input.value);
+            // compute a unique offset: assigning a unique identifier to each message on the client side:
+            const clientOffset = `${socket.id}-${counter++}`;
+            socket.emit('chat message', input.value, clientOffset);
             input.value = '';
           }
         });

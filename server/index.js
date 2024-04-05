@@ -11,7 +11,6 @@ import { open } from 'sqlite';
 
 //SQLite
 // open the database file
-async function fetchData() {
   const db = await open({
     filename: 'chat.db',
     driver: sqlite3.Database
@@ -43,22 +42,30 @@ async function fetchData() {
 
   //listening for incoming events using socket.io
   io.on('connection', async (socket) => {
-    socket.on('chat message', async (msg) => {
+    socket.on('chat message', async (msg, clientOffset, callback) => {
       //handel discennections
         let result;
         try {
-          // store the message in the database
-          result = await db.run('INSERT INTO messages (content) VALUES (?)', msg);
+          // then we store this offset alongside the message on the server side/in the database
+          result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
         } catch (e) {
-          // TODO handle the failure
+          if (e.errno === 19 /* SQLITE_CONSTRAINT */ ) {
+            // the message was already inserted, so we notify the client
+            callback();
+          } else {
+            // nothing to do, just let the client retry
+          }
           return;
         }
+    
         /**emit the event from the server to the rest of the users
         send the message to everyone, including the sender: **/
             //io.emit('chat message', msg);
         // include the offset with the message
         io.emit('chat message', msg, result.lastID);
         console.log('message: ' + msg);
+        // acknowledge the event
+        callback();
     });
             // console.log('a user connected');
             // //add disconnect event to each socket
@@ -87,6 +94,3 @@ async function fetchData() {
   server.listen(3000, () => {
     console.log('server running at http://localhost:3000');
   });
-}
-
-fetchData();
