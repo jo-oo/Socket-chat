@@ -124,7 +124,7 @@
         //when we capture a chat message event we’ll include it in the page.
         socket.on('chat message', (msg, serverOffset) => {
             //chat html:
-            const item = document.createElement('li');
+            //const item = document.createElement('li');
             item.textContent = msg;
             messages.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
